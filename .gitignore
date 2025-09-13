@@ -1,0 +1,13 @@
+backend/node_modules
+backend/src/.env
+dashboard/node_modules
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+
+# Debug files (don’t commit test scripts with secrets)
+backend/debug/

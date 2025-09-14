@@ -575,7 +575,16 @@ app.get('/sync-shopify/:tenantId', async (req, res) => {
   }
 })();
 
+
+cron.schedule('* * * * *', async () => {
+  console.log('⏰ Running scheduled auto-sync (every 1 minute)...');
+  await runAutoSyncWithRetries();
+});
+
 console.log("ℹ️ Automatic sync enabled (background with retries). Use /api/sync-shopify to trigger manually.");
+
+
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`🚀 API running on http://localhost:${port}`));
+

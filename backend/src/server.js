@@ -28,7 +28,7 @@ function normalizeDomain(domain) {
 }
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: 'https://xeno-data-ingestion-itp6.vercel.app/',
   credentials: true
 };
 app.use(cors(corsOptions));

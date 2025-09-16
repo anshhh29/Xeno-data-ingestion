@@ -1,29 +1,49 @@
-const router = require("express").Router();
+const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { Tenant, User } = require("../models");
+const { User, Tenant } = require("../models");
 
+const router = express.Router();
+
+// ----------------- SIGNUP -----------------
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, password, shopDomain, shopAccessToken } = req.body;
+ 
+    console.log("helo world 1")
 
     if (!name || !email || !password || !shopDomain || !shopAccessToken) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const existing = await User.findOne({ where: { email } });
-    if (existing) {
+    
+    console.log("helo world 2")
+
+    // Check if email already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
     }
 
-    const tenant = await Tenant.create({
-      name,
-      shopDomain,
-      shopAccessToken,
-    });
+    
+    console.log("helo world 3")
 
+    // Check if tenant already exists
+    let tenant = await Tenant.findOne({ where: { shopDomain } });
+    if (!tenant) {
+      tenant = await Tenant.create({
+        name,
+        shopDomain,
+        shopAccessToken,
+      });
+    }
+
+    
+
+    // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
+    // Create user
     const user = await User.create({
       email,
       passwordHash,
@@ -31,9 +51,10 @@ router.post("/signup", async (req, res) => {
       role: "admin",
     });
 
+    // Create JWT
     const token = jwt.sign(
       { userId: user.id, tenantId: tenant.id, role: user.role },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "supersecret",
       { expiresIn: "7d" }
     );
 
@@ -44,19 +65,24 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+// ----------------- LOGIN -----------------
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ where: { email } });
 
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password required" });
+    }
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(400).json({ error: "Invalid credentials" });
 
     const valid = await bcrypt.compare(password, user.passwordHash);
-    if (!valid) return res.status(401).json({ error: "Invalid credentials" });
+    if (!valid) return res.status(400).json({ error: "Invalid credentials" });
 
     const token = jwt.sign(
       { userId: user.id, tenantId: user.tenantId, role: user.role },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "supersecret",
       { expiresIn: "7d" }
     );
 

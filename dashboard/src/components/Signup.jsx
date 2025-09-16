@@ -14,7 +14,7 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { login } = useAuth(); 
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,7 +26,7 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch("http://localhost:4000/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -38,8 +38,12 @@ export default function Signup() {
         return;
       }
 
-      login(data.token);
-      navigate("/"); 
+      if (data.token) {
+        login(data.token);
+        navigate("/");
+      } else {
+        setError("No token returned from server");
+      }
     } catch (err) {
       console.error("Signup error", err);
       setError("Network error. Please try again.");
@@ -71,14 +75,7 @@ export default function Signup() {
         }}
       >
         <div style={{ textAlign: "center", marginBottom: "30px" }}>
-          <h1
-            style={{
-              fontSize: "28px",
-              fontWeight: "bold",
-              color: "#333",
-              marginBottom: "8px",
-            }}
-          >
+          <h1 style={{ fontSize: "28px", fontWeight: "bold", color: "#333" }}>
             Create Account
           </h1>
           <p style={{ color: "#666", fontSize: "16px" }}>
@@ -103,221 +100,80 @@ export default function Signup() {
         )}
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: "20px" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                color: "#333",
-                fontWeight: "500",
-                fontSize: "14px",
-              }}
-            >
-              Full Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              placeholder="Enter your full name"
-              value={form.name}
-              onChange={handleChange}
-              required
-              style={{
-                width: "100%",
-                padding: "12px 16px",
-                border: "2px solid #e1e5e9",
-                borderRadius: "10px",
-                fontSize: "16px",
-                transition: "border-color 0.3s",
-                boxSizing: "border-box",
-              }}
-              onFocus={(e) => (e.target.style.borderColor = "#667eea")}
-              onBlur={(e) => (e.target.style.borderColor = "#e1e5e9")}
-            />
-          </div>
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            style={{ width: "100%", marginBottom: "15px", padding: "10px" }}
+          />
 
-          {/* Email */}
-          <div style={{ marginBottom: "20px" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                color: "#333",
-                fontWeight: "500",
-                fontSize: "14px",
-              }}
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              style={{
-                width: "100%",
-                padding: "12px 16px",
-                border: "2px solid #e1e5e9",
-                borderRadius: "10px",
-                fontSize: "16px",
-                transition: "border-color 0.3s",
-                boxSizing: "border-box",
-              }}
-              onFocus={(e) => (e.target.style.borderColor = "#667eea")}
-              onBlur={(e) => (e.target.style.borderColor = "#e1e5e9")}
-            />
-          </div>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            style={{ width: "100%", marginBottom: "15px", padding: "10px" }}
+          />
 
-          <div style={{ marginBottom: "20px" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                color: "#333",
-                fontWeight: "500",
-                fontSize: "14px",
-              }}
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Create a password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              style={{
-                width: "100%",
-                padding: "12px 16px",
-                border: "2px solid #e1e5e9",
-                borderRadius: "10px",
-                fontSize: "16px",
-                transition: "border-color 0.3s",
-                boxSizing: "border-box",
-              }}
-              onFocus={(e) => (e.target.style.borderColor = "#667eea")}
-              onBlur={(e) => (e.target.style.borderColor = "#e1e5e9")}
-            />
-          </div>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            style={{ width: "100%", marginBottom: "15px", padding: "10px" }}
+          />
 
-          {/* Shopify Domain */}
-          <div style={{ marginBottom: "20px" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                color: "#333",
-                fontWeight: "500",
-                fontSize: "14px",
-              }}
-            >
-              Shopify Store Domain
-            </label>
-            <input
-              type="text"
-              name="shopDomain"
-              placeholder="your-store.myshopify.com"
-              value={form.shopDomain}
-              onChange={handleChange}
-              required
-              style={{
-                width: "100%",
-                padding: "12px 16px",
-                border: "2px solid #e1e5e9",
-                borderRadius: "10px",
-                fontSize: "16px",
-                transition: "border-color 0.3s",
-                boxSizing: "border-box",
-              }}
-              onFocus={(e) => (e.target.style.borderColor = "#667eea")}
-              onBlur={(e) => (e.target.style.borderColor = "#e1e5e9")}
-            />
-          </div>
+          <input
+            type="text"
+            name="shopDomain"
+            placeholder="Shopify Domain (myshopify.com)"
+            value={form.shopDomain}
+            onChange={handleChange}
+            required
+            style={{ width: "100%", marginBottom: "15px", padding: "10px" }}
+          />
 
-          <div style={{ marginBottom: "30px" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                color: "#333",
-                fontWeight: "500",
-                fontSize: "14px",
-              }}
-            >
-              Shopify Access Token
-            </label>
-            <input
-              type="password"
-              name="shopAccessToken"
-              placeholder="Enter your Shopify access token"
-              value={form.shopAccessToken}
-              onChange={handleChange}
-              required
-              style={{
-                width: "100%",
-                padding: "12px 16px",
-                border: "2px solid #e1e5e9",
-                borderRadius: "10px",
-                fontSize: "16px",
-                transition: "border-color 0.3s",
-                boxSizing: "border-box",
-              }}
-              onFocus={(e) => (e.target.style.borderColor = "#667eea")}
-              onBlur={(e) => (e.target.style.borderColor = "#e1e5e9")}
-            />
-            <p
-              style={{
-                fontSize: "12px",
-                color: "#666",
-                marginTop: "4px",
-              }}
-            >
-              You can find this in your Shopify admin under <br /> Apps → App
-              and sales channel settings
-            </p>
-          </div>
+          <input
+            type="password"
+            name="shopAccessToken"
+            placeholder="Shopify Access Token"
+            value={form.shopAccessToken}
+            onChange={handleChange}
+            required
+            style={{ width: "100%", marginBottom: "20px", padding: "10px" }}
+          />
 
           <button
             type="submit"
             disabled={loading}
             style={{
               width: "100%",
-              background: loading
-                ? "#ccc"
-                : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              background: loading ? "#ccc" : "#667eea",
               color: "white",
+              padding: "12px",
+              borderRadius: "8px",
               border: "none",
-              borderRadius: "10px",
-              padding: "14px",
-              fontSize: "16px",
+              cursor: "pointer",
               fontWeight: "600",
-              cursor: loading ? "not-allowed" : "pointer",
-              transition: "all 0.3s",
-              marginBottom: "20px",
             }}
           >
-            {loading ? "Creating Account..." : "Create Account"}
+            {loading ? "Creating Account..." : "Sign Up"}
           </button>
         </form>
 
-        <div style={{ textAlign: "center" }}>
-          <p style={{ color: "#666", fontSize: "14px" }}>
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              style={{
-                color: "#667eea",
-                textDecoration: "none",
-                fontWeight: "600",
-              }}
-            >
-              Sign in here
-            </Link>
-          </p>
-        </div>
+        <p style={{ marginTop: "20px", textAlign: "center" }}>
+          Already have an account?{" "}
+          <Link to="/login" style={{ color: "#667eea", fontWeight: "600" }}>
+            Log in
+          </Link>
+        </p>
       </div>
     </div>
   );
